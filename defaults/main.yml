@@ -1,0 +1,9 @@
+# vim: ts=2 sw=2 et ft=ansible.yaml
+---
+# defaults file for opsguru.godaddy
+action:       add
+api_server:   'https://api.godaddy.com'
+api_version:  '1'
+data:         '' # allow
+type:         'A'
+ttl:          3600

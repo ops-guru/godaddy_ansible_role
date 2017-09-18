@@ -1,0 +1,44 @@
+# vim: ts=2 sw=2 et ft=ansible.yaml
+---
+# tasks file for nrg.godaddy
+- name: setup api_server_url
+  set_fact:
+    api_server_url: '{{nrg_godaddy_api_server}}/v{{nrg_godaddy_api_version}}/domains/{{nrg_godaddy_domain}}/records'
+
+
+- name: call godaddy api to update/create new record
+  uri:
+    url:          '{{api_server_url}}'
+    method:       GET
+    body_format:  json
+    headers:
+      Authorization: 'sso-key {{nrg_godaddy_api_key}}:{{nrg_godaddy_api_secret}}'
+  register: current_records
+
+- name: 
+
+- name: setup records_data_dict
+  set_fact:
+    records_data_dict:
+      domain:   '{{nrg_godaddy_domain}}'
+      records:
+      - '{{nrg_godaddy_record}}'
+
+- name: setup setup records_data (json)
+  set_fact:
+    records_data: '{{records_data_dict|to_pretty_json}}'
+
+- name: print current api_server_url
+  debug:
+    var:        api_server_url
+    verbosity:  3
+
+- name: print records_data
+  debug:
+    var:        records_data
+    verbosity:  3
+
+- name: not implemented yet
+  debug:
+    msg: 'deletion of records is not implemented yet
+    verbosity: 3

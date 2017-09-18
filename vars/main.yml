@@ -1,0 +1,18 @@
+# vim: ts=2 sw=2 et ft=ansible.yaml
+---
+# vars file for opsguru.godaddy
+api_key:          '{{godaddy_api_key    |mandatory}}'
+api_secret:       '{{godaddy_api_secret |mandatory}}'
+domain_name:      '{{godaddy_domain_name|mandatory}}'
+record_name:      '{{godaddy_record_name|mandatory}}'
+
+godaddy_record:
+  name:           '{{record_name}}'
+  data:           '{{record_data}}'
+  type:           '{{type}}'
+  ttl:            '{{ttl      |default(omit}}'
+  priority:       '{{priority |default(omit)}}'
+  service:        '{{service  |default(omit)}}'
+  protocol:       '{{protocol |default(omit)}}'
+  port:           '{{port     |default(omit)}}'
+  weight:         '{{weight   |default(omit)}}'

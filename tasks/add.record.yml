@@ -1,0 +1,36 @@
+# vim: ts=2 sw=2 et ft=ansible.yaml
+---
+# tasks file for opsguru.godaddy
+- name: setup api_server_url
+  set_fact:
+    api_server_url: '{{api_server}}/v{{api_version}}/domains/{{domain_name}}/records'
+
+- name: setup records_data_dict
+  set_fact:
+    record_data_dict:
+      domain:   '{{domain_name}}'
+      records:
+      - '{{godaddy_record}}'
+
+- name: setup setup record_data (json)
+  set_fact:
+    record_data: '{{record_data_dict|to_pretty_json}}'
+
+- name: print current api_server_url
+  debug:
+    var:        api_server_url
+    verbosity:  3
+
+- name: print records_data
+  debug:
+    var:        records_data
+    verbosity:  3
+
+- name: call godaddy api to update/create new record
+  uri:
+    url:          '{{api_server_url}}'
+    method:       PATCH
+    body:         '{{record_data}}'
+    body_format:  json
+    headers:
+      Authorization: 'sso-key {{api_key}}:{{api_secret}}'

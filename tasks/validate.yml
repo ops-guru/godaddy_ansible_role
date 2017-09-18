@@ -1,0 +1,12 @@
+# vim: ts=2 sw=2 et ft=ansible.yaml
+---
+# nrg.godaddy vars validations
+- name: validate we have mandatory variables
+  assert:
+    that: '{{condition}}'
+  with_items:
+  - nrg_godaddy_record_data|default("", true)|length
+  loop_control:
+    loop_var: condition
+  when:
+  - action == "add"
