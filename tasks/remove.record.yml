@@ -3,8 +3,9 @@
 # tasks file for nrg.godaddy
 - name: setup api_server_url
   set_fact:
-    api_server_url: '{{nrg_godaddy_api_server}}/v{{nrg_godaddy_api_version}}/domains/{{nrg_godaddy_domain}}/records'
-
+    api_server_url: '{{api_server}}/v{{api_version}}/domains/{{domain_name}}/records'
+    authorization:  'sso-key {{api_key}}:{{api_secret}}'
+    need_delete:    False
 
 - name: call godaddy api to update/create new record
   uri:
@@ -12,33 +13,49 @@
     method:       GET
     body_format:  json
     headers:
-      Authorization: 'sso-key {{nrg_godaddy_api_key}}:{{nrg_godaddy_api_secret}}'
-  register: current_records
+      Authorization: '{{authorization}}'
+  register: current_records_result
 
-- name: 
-
-- name: setup records_data_dict
+- name: setup current_records
   set_fact:
-    records_data_dict:
-      domain:   '{{nrg_godaddy_domain}}'
-      records:
-      - '{{nrg_godaddy_record}}'
+    current_records: '{{current_records_result.json}}'
 
-- name: setup setup records_data (json)
-  set_fact:
-    records_data: '{{records_data_dict|to_pretty_json}}'
-
-- name: print current api_server_url
+- name: print current_records
   debug:
-    var:        api_server_url
+    var:        current_records
     verbosity:  3
 
-- name: print records_data
+- name: create empty new_records
+  set_fact:
+    new_records: []
+
+- name: update new_records with records we want to leave
+  set_fact:
+    new_records: '{{new_records + [record]}}'
+  with_items: '{{current_records}}'
+  loop_control:
+    loop_var: record
+  when:
+  - ((record.type != type) or (record.name != record_name))
+
+- name: print new_records
   debug:
-    var:        records_data
+    var:        new_records
     verbosity:  3
 
-- name: not implemented yet
+- name: print new_records
   debug:
-    msg: 'deletion of records is not implemented yet
-    verbosity: 3
+    var:        new_records
+    verbosity:  3
+
+- name: call godaddy api to delete a record
+  uri:
+    url:          '{{api_server_url}}'
+    method:       PUT
+    body:         '{{new_records|to_json}}'
+    body_format:  json
+    headers:
+      Authorization: '{{authorization}}'
+      Accept: 'application/json'
+  when:
+  - (current_records|length) != (new_records|length)

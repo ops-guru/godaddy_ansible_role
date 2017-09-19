@@ -10,7 +10,7 @@ godaddy_record:
   name:           '{{record_name}}'
   data:           '{{record_data}}'
   type:           '{{type}}'
-  ttl:            '{{ttl      |default(omit}}'
+  ttl:            '{{ttl      |default(omit)}}'
   priority:       '{{priority |default(omit)}}'
   service:        '{{service  |default(omit)}}'
   protocol:       '{{protocol |default(omit)}}'

@@ -1,5 +1,8 @@
+# vim: ts=2 sw=2 et ft=ansible.yaml
 ---
-- hosts: localhost
-  remote_user: root
+# test.yml
+- name: run role opsguru.godaddy
+  hosts: localhost
+  become: False
   roles:
-    - nrg.godaddy
+  - role: opsguru.godaddy

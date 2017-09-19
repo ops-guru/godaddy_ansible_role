@@ -4,33 +4,72 @@
 - name: setup api_server_url
   set_fact:
     api_server_url: '{{api_server}}/v{{api_version}}/domains/{{domain_name}}/records'
+    authorization:  'sso-key {{api_key}}:{{api_secret}}'
+
+- name: setup godaddy dns record
+  set_fact:
+    godaddy_dns_record:
+      name:           '{{record_name}}'
+      data:           '{{record_data}}'
+      type:           '{{type}}'
+      ttl:            '{{ttl}}'
+
+- name: update godaddy_dns_record with priority
+  set_fact:
+    godaddy_dns_record: '{{godaddy_dns_record|combine({"priority": priority})}}'
+  when:
+  - priority|default("", true)|length
+
+- name: update godaddy_dns_record with service
+  set_fact:
+    godaddy_dns_record: '{{godaddy_dns_record|combine({"service": service})}}'
+  when:
+  - service|default("", true)|length
+
+- name: update godaddy_dns_record with protocol
+  set_fact:
+    godaddy_dns_record: '{{godaddy_dns_record|combine({"protocol": protocol})}}'
+  when:
+  - protocol|default("", true)|length
+
+- name: update godaddy_dns_record with port
+  set_fact:
+    godaddy_dns_record: '{{godaddy_dns_record|combine({"port": port})}}'
+  when:
+  - port|default("", true)|length
+
+- name: update godaddy_dns_record with weight
+  set_fact:
+    godaddy_dns_record: '{{godaddy_dns_record|combine({"weight": weight})}}'
+  when:
+  - weight|default("", true)|length
+
 
 - name: setup records_data_dict
   set_fact:
-    record_data_dict:
-      domain:   '{{domain_name}}'
-      records:
-      - '{{godaddy_record}}'
+    body_dict: []
+    #    - '{{godaddy_dns_record}}'
 
 - name: setup setup record_data (json)
   set_fact:
-    record_data: '{{record_data_dict|to_pretty_json}}'
+    body: '{{body_dict|to_nice_json}}'
 
 - name: print current api_server_url
   debug:
     var:        api_server_url
     verbosity:  3
 
-- name: print records_data
+- name: print body
   debug:
-    var:        records_data
+    var:        body
     verbosity:  3
 
 - name: call godaddy api to update/create new record
   uri:
     url:          '{{api_server_url}}'
     method:       PATCH
-    body:         '{{record_data}}'
+    body:         '{{body}}'
     body_format:  json
     headers:
-      Authorization: 'sso-key {{api_key}}:{{api_secret}}'
+      Authorization: '{{authorization}}'
+      Accept: 'application/json'
