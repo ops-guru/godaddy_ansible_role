@@ -1,8 +1,8 @@
 # vim: ts=2 sw=2 et ft=ansible.yaml
 ---
 # test.yml
-- name: run role opsguru.godaddy
+- name: run role ops-guru.godaddy
   hosts: localhost
   become: False
   roles:
-  - role: opsguru.godaddy
+  - role: ops-guru.godaddy
