@@ -1,4 +1,4 @@
-# opsguru.godaddy
+# ops-guru.godaddy
 
 This role helps to manipulates your GoDaddy account using the REST API
 
@@ -62,6 +62,18 @@ godaddy_domain_name:  '{{lookup("env", "GODADDY_DOMAIN")}}'
     * The Playbook is a copy of the playbook from `tests` folder of the role
         * Under convenient name, here I assume it is `site.yml`
 
+Just to make things standard, here's that file:
+
+```yamlex
+# vim: ts=2 sw=2 et ft=ansible.yaml
+---
+# test.yml
+- name: run role ops-guru.godaddy
+  hosts: localhost
+  become: False
+  roles:
+  - role: ops-guru.godaddy
+```
 ### Preparation:
 
 Set environment variables (for convenience)
