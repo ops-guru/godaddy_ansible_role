@@ -1,12 +1,13 @@
 # opsguru.godaddy
 
-This role helps to manipulate DNS records hosted on GoDaddy, using their new REST API
+This role helps to manipulates your GoDaddy account using the REST API
 
 ## Requirements
 
 * Obtain GoDaddy REST API Credentials [GoDaddy Dev Site](https://developer.godaddy.com/keys)
-* just an idea: do not keep your api credentials in source control
+    * Make sure you create a "Production" key
 * To simplify execution and command length, you may want to follow example's idea of creating variables `.yml` file
+* just an idea: do not keep your api credentials in source control
 
 
 
@@ -31,7 +32,6 @@ The variables are defined in `vars/main.yml` with defaults in `defaults/main.yml
 | `weight`              | Service Record `weight` Field  | `N`                        | Set by API  | positive integer                             |
 
 
-
 ## Dependencies
 
 None
@@ -48,45 +48,68 @@ None
 # Obtain API Key and Secret at https://developer.godaddy.com
 # you most probably will need to add several records of the same domain
 
-godaddy_api_key:      '123456789abcdef0123456789abcdef'
-godaddy_api_secret:   'ABCDEFG012357asdfasdasdj1234'
-godaddy_domain_name:  'mydomain.com'
+godaddy_api_key:      '{{lookup("env", "GODADDY_API_KEY")}}'
+godaddy_api_secret:   '{{lookup("env", "GODADDY_API_SECRET")}}'
+godaddy_domain_name:  '{{lookup("env", "GODADDY_DOMAIN")}}'
 
 ```
 
 ### Example playbook
-```yamlex
-# site.yml
----
-- name: showcase of role opsguru.godaddy
-  hosts: localhost
-  roles:
-  - role: opsguru.godaddy
 
+* Assumptions:
+    * The below is executed under your Ansible 'project' root folder
+    * The role is already consumed by `ansible-galaxy` or `git`, i.e. it is locally available
+    * The Playbook is a copy of the playbook from `tests` folder of the role
+        * Under convenient name, here I assume it is `site.yml`
+
+### Preparation:
+
+Set environment variables (for convenience)
+
+```bash
+$ export GODADDY_API_KEY="<your key>"
+$ export GODADDY_API_SECRET="<your secret>"
+$ export GODADDY_DOMAIN="<your domain>"
+$ cat > godaddy_data.yml << _EOF
+godaddy_api_key: '${GODADDY_API_KEY}'
+godaddy_api_secret: '${GODADDY_API_SECRET}'
+godaddy_domain_name: '${GODADDY_DOMAIN}'
+_EOF
 ```
 
 #### To add dns 'A' record 'myservice.mydomain.com':
 ```bash
-
 $ ansible-playbook \
     -i inventory \
-    -e "@godaddy_vars.yml" \
+    -e @godaddy_data.yml \
     -e godaddy_record_name=myservice \
     -e record_data=1.2.3.4 \
     site.yml
 ```
 
-#### To remove dns 'A' record 'myservice.mydomain.com':
+#### To remove dns "A" record "myservice.${GODADDY_DOMAIN}":
 ```bash
-
 $ ansible-playbook \
     -i inventory \
-    -e "@godaddy_vars.yml" \
-    -e action=remove \
+    -e @godaddy_data.yml \
     -e godaddy_record_name=myservice \
     -e record_data=1.2.3.4 \
+    -e action=remove \
     site.yml
 ```
+#### To add dns 'SRV' record for ldap service on port 389 tcp:
+```bash
+$ ansible-playbook \
+    -i inventory \
+    -e @godaddy_data.yml \
+    -e godaddy_record_name=ldap \
+    -e record_data=1.2.3.4 \
+    -e service=ldap \
+    -e protocol=tcp \
+    -e port=389 \
+    site.yml
+```
+
 
 License
 -------
