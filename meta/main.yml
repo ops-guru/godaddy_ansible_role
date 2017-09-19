@@ -11,5 +11,16 @@ galaxy_info:
   - system
   - network
   - dns
-  platforms: []
+  platforms:
+  - name: EL
+    versions:
+    - 7
+  - name: Ubuntu
+    versions:
+    - trusty
+    - xenial
+    - zesty
+  - name: MacOSX
+    versions:
+    - 10.12
 dependencies: []
