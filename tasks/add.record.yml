@@ -47,8 +47,7 @@
 
 - name: setup records_data_dict
   set_fact:
-    body_dict: []
-    #    - '{{godaddy_dns_record}}'
+    body_dict: [ '{{godaddy_dns_record}}' ]
 
 - name: setup setup record_data (json)
   set_fact:
